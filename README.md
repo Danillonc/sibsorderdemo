@@ -7,6 +7,6 @@ If you pay attention the beans were configurated manually without annotations ju
 The class diagram was developed using simple logic, otherwise the complexity would increase.
 
 # Instructions to run the application:
-Java 1.8 <br>
+Java 1.8 + <br>
 Lombok
 
