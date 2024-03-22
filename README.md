@@ -7,6 +7,9 @@ If you pay attention the beans were configurated manually without annotations ju
 The class diagram was developed using simple logic, otherwise the complexity would increase.<br>
 I need to add extra fields to the class diagram because it didn't come in the challenge text.
 
+# API Documentation
+http://localhost:8080/swagger-ui/index.html
+
 # Project Technologies
 - Java<br>
 - Spring boot<br>
