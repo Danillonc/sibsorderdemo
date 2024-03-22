@@ -28,7 +28,7 @@ public class OrderServiceImpl implements OrderService {
         Order createdOrder;
         try {
             verifyOrderStock(order);
-            updateStockItem(order);
+            updateOrderStockItem(order);
             createdOrder = this.orderRepository.saveAndFlush(order);
             LOGGER.info("Order created: {}", order);
         } catch (Exception e) {
@@ -62,13 +62,19 @@ public class OrderServiceImpl implements OrderService {
                     o.complete();
                     LOGGER.info("Order completed: {}", o);
                     this.orderRepository.saveAndFlush(o);
-                }, () ->{
+                }, () -> {
                     throw new EntityNotFoundException("Order cannot be completed.");
                 });
     }
 
     @Override
     public void deleteOrder(long orderId) {
+        this.orderRepository.findById(orderId)
+                .ifPresentOrElse(o -> {
+                    this.orderRepository.deleteById(orderId);
+                }, () -> {
+                    throw new EntityNotFoundException("Order cannot be deleted.");
+                });
 
     }
 
@@ -84,7 +90,7 @@ public class OrderServiceImpl implements OrderService {
                 });
     }
 
-    private void updateStockItem(final Order order) {
+    private void updateOrderStockItem(final Order order) {
         var stockItemQuantity = 0;
         final Optional<StockMovement> stockMovement = this.stockService.getStockMovementByItemId(order.getOrderItem().getId());
         if (stockMovement.isPresent()) {

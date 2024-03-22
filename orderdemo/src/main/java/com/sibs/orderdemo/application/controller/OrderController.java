@@ -35,4 +35,10 @@ public class OrderController {
         this.orderService.completeOrder(orderId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @DeleteMapping("/delete/{orderId}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable long orderId){
+        this.orderService.deleteOrder(orderId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
