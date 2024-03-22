@@ -5,10 +5,7 @@ import com.sibs.orderdemo.domain.service.OrderService;
 import com.sibs.orderdemo.util.OrderDtoConverter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/order")
@@ -21,8 +18,21 @@ public class OrderController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Void> createOrder(@RequestBody final OrderDto orderDto){
-        this.orderService.createOrder(OrderDtoConverter.convertFromDto(orderDto));
+    public ResponseEntity<OrderDto> createOrder(@RequestBody final OrderDto orderDto) {
+        OrderDto dto = OrderDtoConverter.convertFromDomain(
+                this.orderService.createOrder(OrderDtoConverter.convertFromDto(orderDto)));
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @PutMapping("/uodate/{orderId}")
+    public ResponseEntity<Void> updateOrder(@PathVariable long orderId, @RequestBody final OrderDto orderDto) {
+        this.orderService.updateOrder(orderId, OrderDtoConverter.convertFromDto(orderDto));
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PatchMapping("/update/complete/{orderId}")
+    public ResponseEntity<Void> completeOrder(@PathVariable long orderId){
+        this.orderService.completeOrder(orderId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

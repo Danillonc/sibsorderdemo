@@ -39,13 +39,32 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void updateOrder(long orderId, final Order order) {
+        this.orderRepository.findById(orderId)
+                .ifPresentOrElse(o -> {
+                            o.validateStatus();
+                            o.setQuantity(order.getQuantity());
+                            o.setOrderItem(order.getOrderItem());
+                            o.setUser(order.getUser());
+                            LOGGER.info("Order updated: {}", o);
+                            this.orderRepository.saveAndFlush(o);
+                        },
+                        () -> {
+                            throw new EntityNotFoundException("Order cannot be updated.");
+                        });
 
     }
 
 
     @Override
     public void completeOrder(long orderId) {
-
+        this.orderRepository.findById(orderId)
+                .ifPresentOrElse(o -> {
+                    o.complete();
+                    LOGGER.info("Order completed: {}", o);
+                    this.orderRepository.saveAndFlush(o);
+                }, () ->{
+                    throw new EntityNotFoundException("Order cannot be completed.");
+                });
     }
 
     @Override
@@ -65,27 +84,15 @@ public class OrderServiceImpl implements OrderService {
                 });
     }
 
-    private void updateStockItem(final Order order){
+    private void updateStockItem(final Order order) {
         var stockItemQuantity = 0;
         final Optional<StockMovement> stockMovement = this.stockService.getStockMovementByItemId(order.getOrderItem().getId());
-        if(stockMovement.isPresent()){
+        if (stockMovement.isPresent()) {
             LOGGER.info("StockMovement: {}", stockMovement.get());
             stockItemQuantity = stockMovement.get().getQuantity() - order.getQuantity();
             stockMovement.get().setQuantity(stockItemQuantity);
         }
         this.stockService.updateStock(stockMovement.get(), stockMovement.get().getId());
     }
-
-//    private long getLastOrderId() {
-//        AtomicLong lastOrderId = new AtomicLong(0L);
-//        this.orderRepository.findTopByOrderByCreationDateDesc()
-//                .ifPresentOrElse(order -> {
-//                            lastOrderId.set(order.getId() + 1);
-//                        },
-//                        () -> {
-//                            lastOrderId.set(1L);
-//                        });
-//        return lastOrderId.get();
-//    }
 
 }

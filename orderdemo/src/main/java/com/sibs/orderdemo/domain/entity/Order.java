@@ -68,7 +68,7 @@ public class Order {
 //                .orElseThrow(() -> new EntityNotFoundException("Product doesn't exist"));
 //    }
 
-    private void validateStatus() {
+    public void validateStatus() {
         if (OrderStatus.COMPLETED.equals(orderStatus)) {
             throw new DomainException("The order is in completed status.");
         }
