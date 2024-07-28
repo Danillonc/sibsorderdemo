@@ -1,8 +1,9 @@
 package com.sibs.orderdemo.application.controller;
 
-import com.sibs.orderdemo.application.request.UserDto;
+import com.sibs.orderdemo.application.request.UserRecord;
 import com.sibs.orderdemo.domain.service.UserService;
 import com.sibs.orderdemo.util.UserDtoConverter;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,19 +19,19 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<UserDto> createUser(@RequestBody final UserDto userDto){
-        UserDto dto =UserDtoConverter.convertToDto(this.userService
+    public ResponseEntity<UserRecord> createUser(@RequestBody @Valid final UserRecord userDto){
+        UserRecord dto = UserDtoConverter.convertToDto(this.userService
                 .createUSer(UserDtoConverter.convertToDomain(userDto)));
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> getUser(@PathVariable Integer userId){
+    public ResponseEntity<UserRecord> getUser(@PathVariable Integer userId){
         return new ResponseEntity<>(UserDtoConverter.convertToDto(this.userService.getUser(userId)), HttpStatus.OK);
     }
 
     @PatchMapping("/update/{userId}")
-    public ResponseEntity<Void> update(@RequestBody final UserDto userDto, @PathVariable long userId){
+    public ResponseEntity<Void> update(@RequestBody @Valid final UserRecord userDto, @PathVariable long userId){
         this.userService.updateUser(UserDtoConverter.convertToDomain(userDto), userId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

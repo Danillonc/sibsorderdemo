@@ -1,8 +1,9 @@
 package com.sibs.orderdemo.application.controller;
 
-import com.sibs.orderdemo.application.request.ItemDto;
+import com.sibs.orderdemo.application.request.ItemRecord;
 import com.sibs.orderdemo.domain.service.ItemService;
 import com.sibs.orderdemo.util.ItemDtoConverter;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/v1/item")
 public class ItemController {
 
-    private ItemService itemService;
+    private final ItemService itemService;
 
     public ItemController(ItemService itemService){
         this.itemService = itemService;
@@ -19,19 +20,19 @@ public class ItemController {
 
 
     @PostMapping("/create")
-    public ResponseEntity<ItemDto> createItem(@RequestBody ItemDto itemDto){
-        ItemDto dto = ItemDtoConverter.convertToDto(
+    public ResponseEntity<ItemRecord> createItem(@RequestBody @Valid ItemRecord itemDto){
+        ItemRecord dto = ItemDtoConverter.convertToDto(
                 this.itemService.createItem(ItemDtoConverter.convertToDomain(itemDto)));
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<ItemDto> getItem(@PathVariable long itemId){
+    public ResponseEntity<ItemRecord> getItem(@PathVariable long itemId){
         return new ResponseEntity<>(ItemDtoConverter.convertToDto(this.itemService.getItem(itemId)), HttpStatus.OK);
     }
 
     @PatchMapping("/update/{itemId}")
-    public ResponseEntity<Void> updateItem(@RequestBody final ItemDto itemDto, @PathVariable long itemId){
+    public ResponseEntity<Void> updateItem(@RequestBody @Valid final ItemRecord itemDto, @PathVariable long itemId){
         this.itemService.updateItem(ItemDtoConverter.convertToDomain(itemDto), itemId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

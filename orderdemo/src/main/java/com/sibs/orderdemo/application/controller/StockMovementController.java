@@ -1,8 +1,9 @@
 package com.sibs.orderdemo.application.controller;
 
-import com.sibs.orderdemo.application.request.StockMovementDto;
+import com.sibs.orderdemo.application.request.StockMovementRecord;
 import com.sibs.orderdemo.domain.service.StockMovementService;
 import com.sibs.orderdemo.util.StockDtoConverter;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +23,8 @@ public class StockMovementController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<StockMovementDto> createStock(@RequestBody final StockMovementDto stockDto){
-        StockMovementDto dto = StockDtoConverter.convertToDto(this.stockMovementService
+    public ResponseEntity<StockMovementRecord> createStock(@RequestBody @Valid final StockMovementRecord stockDto){
+        StockMovementRecord dto = StockDtoConverter.convertToDto(this.stockMovementService
                 .createStock(StockDtoConverter.convertToDomain(stockDto)));
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
