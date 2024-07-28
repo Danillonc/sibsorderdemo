@@ -4,9 +4,11 @@ import com.sibs.orderdemo.domain.entity.User;
 import com.sibs.orderdemo.domain.repository.UserRepository;
 import com.sibs.orderdemo.domain.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;

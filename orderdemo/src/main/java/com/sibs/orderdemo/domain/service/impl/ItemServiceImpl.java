@@ -4,9 +4,11 @@ import com.sibs.orderdemo.domain.entity.Item;
 import com.sibs.orderdemo.domain.repository.ItemRepository;
 import com.sibs.orderdemo.domain.service.ItemService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 public class ItemServiceImpl implements ItemService {
 
     private ItemRepository itemRepository;

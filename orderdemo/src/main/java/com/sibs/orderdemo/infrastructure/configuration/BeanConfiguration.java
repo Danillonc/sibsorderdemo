@@ -16,6 +16,7 @@ import com.sibs.orderdemo.domain.service.impl.UserServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 /**
  * Class responsible for configuring beans.
@@ -29,6 +30,7 @@ public class BeanConfiguration {
         return new UserServiceImpl(userRepository);
     }
 
+    @Primary
     @Bean
     StockMovementService stockService(final StockMovementRepository stockMovementRepository){
         return new StockMovementServiceImpl(stockMovementRepository);
