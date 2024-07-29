@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -32,10 +33,18 @@ public class StockMovementServiceImpl implements StockMovementService {
     }
 
     @Override
+    public Optional<StockMovement> getStockMovementByItemIdWithLock(long id) {
+        return this.stockMovementRepository.findByItemIdWithLock(id);
+    }
+
+
+    @Transactional
+    @Override
     public StockMovement createStock(final StockMovement stockMovement) {
         return this.stockMovementRepository.saveAndFlush(stockMovement);
     }
 
+    @Transactional
     @Override
     public void updateStock(final StockMovement stockMovement, long stockId) {
         this.stockMovementRepository.findById(stockId)
@@ -57,6 +66,7 @@ public class StockMovementServiceImpl implements StockMovementService {
         return this.stockMovementRepository.findById(stockId);
     }
 
+    @Transactional
     @Override
     public void deleteStockMovement(long stockId) {
         this.stockMovementRepository.findById(stockId)

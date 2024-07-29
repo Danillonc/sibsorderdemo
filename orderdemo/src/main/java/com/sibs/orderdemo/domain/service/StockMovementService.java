@@ -9,6 +9,8 @@ public interface StockMovementService {
 
     public Optional<StockMovement> getStockMovementByItemId(long id);
 
+    public Optional<StockMovement> getStockMovementByItemIdWithLock(long id);
+
     public StockMovement createStock(final StockMovement stockMovement);
 
     public void updateStock(final StockMovement stockMovement, long stockId);

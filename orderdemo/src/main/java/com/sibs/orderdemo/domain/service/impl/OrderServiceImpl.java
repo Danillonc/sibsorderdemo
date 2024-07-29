@@ -7,9 +7,12 @@ import com.sibs.orderdemo.domain.repository.OrderRepository;
 import com.sibs.orderdemo.domain.service.OrderService;
 import com.sibs.orderdemo.domain.service.StockMovementService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.LockModeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -25,6 +28,7 @@ public class OrderServiceImpl implements OrderService {
         this.stockService = stockService;
     }
 
+    @Transactional
     @Override
     public Order createOrder(Order order) {
         Order createdOrder;
@@ -34,15 +38,19 @@ public class OrderServiceImpl implements OrderService {
             createdOrder = this.orderRepository.saveAndFlush(order);
             LOGGER.info("Order created: {}", order);
         } catch (Exception e) {
+            LOGGER.error("Creater order error: ", e);
             throw e;
         }
         return createdOrder;
     }
 
+    @Transactional
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Override
     public void updateOrder(long orderId, final Order order) {
         this.orderRepository.findById(orderId)
                 .ifPresentOrElse(o -> {
+                            verifyOrderStock(order);
                             o.validateStatus();
                             o.setQuantity(order.getQuantity());
                             o.setOrderItem(order.getOrderItem());
@@ -51,6 +59,7 @@ public class OrderServiceImpl implements OrderService {
                             this.orderRepository.saveAndFlush(o);
                         },
                         () -> {
+                            LOGGER.error("Update order error");
                             throw new EntityNotFoundException("Order cannot be updated.");
                         });
 
@@ -65,6 +74,7 @@ public class OrderServiceImpl implements OrderService {
                     LOGGER.info("Order completed: {}", o);
                     this.orderRepository.saveAndFlush(o);
                 }, () -> {
+                    LOGGER.error("Complete order error");
                     throw new EntityNotFoundException("Order cannot be completed.");
                 });
     }
@@ -75,6 +85,7 @@ public class OrderServiceImpl implements OrderService {
                 .ifPresentOrElse(o -> {
                     this.orderRepository.deleteById(orderId);
                 }, () -> {
+                    LOGGER.error("Delete order error");
                     throw new EntityNotFoundException("Order cannot be deleted.");
                 });
 
@@ -88,19 +99,20 @@ public class OrderServiceImpl implements OrderService {
                     }
                 },
                 () -> {
-                    throw new EntityNotFoundException("Not exist item Stock.");
+                    LOGGER.error("Verify order stockitem error");
+                    throw new EntityNotFoundException("Not exists item Stock.");
                 });
     }
 
     private void updateOrderStockItem(final Order order) {
         var stockItemQuantity = 0;
-        final Optional<StockMovement> stockMovement = this.stockService.getStockMovementByItemId(order.getOrderItem().getId());
+        final Optional<StockMovement> stockMovement = this.stockService.getStockMovementByItemIdWithLock(order.getOrderItem().getId());
         if (stockMovement.isPresent()) {
             LOGGER.info("StockMovement: {}", stockMovement.get());
             stockItemQuantity = stockMovement.get().getQuantity() - order.getQuantity();
             stockMovement.get().setQuantity(stockItemQuantity);
+            this.stockService.updateStock(stockMovement.get(), stockMovement.get().getId());
         }
-        this.stockService.updateStock(stockMovement.get(), stockMovement.get().getId());
     }
 
 }
