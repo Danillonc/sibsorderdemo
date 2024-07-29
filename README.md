@@ -20,5 +20,6 @@ http://localhost:8080/swagger-ui/index.html
 
 # Instructions to run the application:
 Java 1.8 + <br>
-Lombok
+
+To run the application you need to execute the main class inside the project and the application will be capable of getting every service on.
 
